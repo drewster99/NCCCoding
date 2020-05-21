@@ -58,7 +58,24 @@ final class NCCCodingTests: XCTestCase {
         }
     }
 
+    func testCodingCodableExtensions() {
+
+        struct Chuck: Codable, NCCCodingCodable, Equatable {
+            var s: String
+            var d: Double
+        }
+
+        let c = Chuck(s: "hello", d: 29.1)
+        if let error = c.encode(filename: "flappiness") {
+            XCTFail("Error encoding: \(error.localizedDescription)")
+        } else if let d = Chuck(from: "flappiness") {
+            print("Yepper McDepper.")
+            XCTAssertEqual(c, d, "Encoded and decoded did not match!")
+        }
+    }
+
     static var allTests = [
         ("encode/decode", testEncodeDecode),
+        ("NCCCodingCodable extensions", testCodingCodableExtensions),
     ]
 }

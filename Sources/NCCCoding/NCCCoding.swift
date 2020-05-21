@@ -154,3 +154,41 @@ public struct NCCCoding {
         }
     }
 }
+
+typealias NCCCodingCodable = NCCCodingEncodable & NCCCodingDecodable
+
+protocol NCCCodingEncodable where Self: Encodable {
+    func encode(filename: String,
+                in directoryType: FileManager.SearchPathDirectory) -> Error?
+    func encode(to url: URL) -> Error?
+}
+extension NCCCodingEncodable {
+
+    func encode(filename: String,
+                in directoryType: FileManager.SearchPathDirectory = .documentDirectory) -> Error? {
+        NCCCoding.encode(self, filename: filename, in: directoryType)
+    }
+
+    func encode(to url: URL) -> Error? {
+        NCCCoding.encode(self, to: url)
+    }
+}
+
+protocol NCCCodingDecodable where Self: Decodable {
+    init?(from url: URL)
+    init?(from filename: String, in directoryType: FileManager.SearchPathDirectory)
+
+}
+extension NCCCodingDecodable {
+    init?(from url: URL) {
+        guard let result: Self = NCCCoding.decode(url) else { return nil }
+        self = result
+    }
+
+    init?(from filename: String, in directoryType: FileManager.SearchPathDirectory = .documentDirectory) {
+        guard let result: Self = NCCCoding.decode(filename: filename, in: directoryType) else {
+            return nil
+        }
+        self = result
+    }
+}
